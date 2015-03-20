@@ -1,0 +1,11 @@
+{
+  "name": "LEC_8",
+  "version": "1.0.0",
+  "description": "homework",
+  "main": "server.js",
+  "author": "AndreyFizer",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.12.3"
+  }
+}
