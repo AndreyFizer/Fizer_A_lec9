@@ -5,6 +5,7 @@
 var express = require ('express');
 var app = express();
 var index = require('./routers/index.js');
+var marshrut = require('./routers/marshrut.js');
 //var Unit = index.Unit;
 //var a = new Unit('ddd');
 //index(app);
@@ -14,6 +15,17 @@ var index = require('./routers/index.js');
 var unit_Vasya = new index.Unit('Vasya na koni');
 var dracon_Vasya = new index.Unit_2('Vasya na drakoni');
 
+//marshrut.firstMarsh(unit_Vasya);
+
+console.log('---------------------');
+app.get('/moveTo',function(req,res){
+    var loc;
+    unit_Vasya.moveTo();
+    loc = unit_Vasya.currentLoc;
+    res.status(200).send(loc);
+});
+
+/*
 console.dir(unit_Vasya);
 console.dir(dracon_Vasya);
 
@@ -32,7 +44,7 @@ dracon_Vasya.fight(unit_Vasya);
 dracon_Vasya.fight(unit_Vasya);
 dracon_Vasya.fireBall(unit_Vasya);
 dracon_Vasya.fireBall(unit_Vasya);
-
+*/
 
 
 

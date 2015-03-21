@@ -7,8 +7,7 @@
 
 var wind = [20, -50];                          //вектор, що задає напрямок та силу вітру
 var MAX_LVL = 30;                              //максимальний рівень, якого можуть досягти персонажі
-var MAX_X=800;
-var MAX_Y=600;
+
 
 console.log("Пов'язало");
 
@@ -56,7 +55,7 @@ function Unit (uName) {
         this.moveTo = function() {
             var x = Math.random()*100-50;                        //рандомно задається вектор руху (x,y)
             var y = Math.random()*100-50;
-            //console.log('x: ' + x + ' y: ' + y);
+            console.log('x: ' + x + ' y: ' + y);
             var currentSpeed = this.currentSpeed;
             var maxSpeed = this.maxSpeed;
             x = this.canFly ? (x * currentSpeed + wind[0]) : (x * currentSpeed);        //в залежності від швидкості змінюється довжина вектора руху,
