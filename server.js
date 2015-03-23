@@ -5,26 +5,20 @@
 var express = require ('express');
 var app = express();
 var index = require('./routers/index.js');
-var marshrut = require('./routers/marshrut.js');
-//var Unit = index.Unit;
-//var a = new Unit('ddd');
-//index(app);
-
-//console.log(a);
 
 var unit_Vasya = new index.Unit('Vasya na koni');
 var dracon_Vasya = new index.Unit_2('Vasya na drakoni');
+var loc='';
 
-//marshrut.firstMarsh(unit_Vasya);
-
-console.log('---------------------');
-app.get('/moveTo',function(req,res){
-    var loc;
-    unit_Vasya.moveTo();
-    loc = unit_Vasya.currentLoc;
+app.get('/moveTo/:myX/:myY',function(req,res){
+    unit_Vasya.moveTo(req.params.myX,req.params.myY);
+    loc += unit_Vasya.currentLoc.x+' --- '+unit_Vasya.currentLoc.y+'\n';
+    console.log(unit_Vasya.currentLoc);
     res.status(200).send(loc);
 });
 
+//unit_Vasya.moveTo(100,200);
+//unit_Vasya.moveTo(100,200);
 /*
 console.dir(unit_Vasya);
 console.dir(dracon_Vasya);
@@ -45,11 +39,6 @@ dracon_Vasya.fight(unit_Vasya);
 dracon_Vasya.fireBall(unit_Vasya);
 dracon_Vasya.fireBall(unit_Vasya);
 */
-
-
-
-
-
 
 
 app.listen(3000,function(){

@@ -8,8 +8,9 @@
 var wind = [20, -50];                          //вектор, що задає напрямок та силу вітру
 var MAX_LVL = 30;                              //максимальний рівень, якого можуть досягти персонажі
 
-
-console.log("Пов'язало");
+var marshUnit = [{x:50,y:20},{x:70,y:30},{x:80,y:20},{x:50,y:20}];
+var marshUnit_2 = [{},{}];
+//console.log("Пов'язало");
 
 //ф-ція, що описує 1-ий клас - Персонаж №1
 function Unit (uName) {
@@ -17,9 +18,12 @@ function Unit (uName) {
         this.maxHp = 1000;                      //максимальний запас здоров'я
         this.currentHp = 1000;                  //поточний запас здоров'я (0 - 1000)
         this.maxSpeed = 2;                      //максимальна швидкість персонажа
-        this.currentSpeed = 1.2;                //поточна швидкість персонажа (0.0 - 2.0)
+        this.currentSpeed = 50 ;                // <змінено> поточна швидкість персонажа - кількість певних одиниць пройдених за один хід
+        this.speedReserve = 0;
         this.canFly = false;                    //можливість літати
-        this.currentLoc = [0, 0];               //поточне розташування персонажа (координати в 2D)
+        //this.route=[{x:50,y:20},{x:70,y:30},{x:80,y:20},{x:50,y:20}];
+        this.route=[{x:0,y:0},{x:0,y:100}];
+        this.currentLoc = this.route[0];        //поточне розташування персонажа (координати в 2D)
         this.lvl = 1;                           //рівень персонажа
         this.currentEXP = 0;                    //
         this.lvlUp_EXP = 400;                   //
@@ -29,6 +33,7 @@ function Unit (uName) {
         this.atAccur = 0.15;                    //точність нанесення ударів (0.0 - 0.95)
         this.atEvas = 0.1;                      //шанс ухилитись від удару противника (0.0 - 1.0)
         this.atArmor = 20;                      //
+
 
         //метод, який змінює характеристики персонажа при збільшенні його рівня
         this.lvl_UP = function () {
@@ -52,16 +57,28 @@ function Unit (uName) {
         }
 
         //метод, який описує рух персонажа
-        this.moveTo = function() {
-            var x = Math.random()*100-50;                        //рандомно задається вектор руху (x,y)
-            var y = Math.random()*100-50;
-            console.log('x: ' + x + ' y: ' + y);
-            var currentSpeed = this.currentSpeed;
-            var maxSpeed = this.maxSpeed;
-            x = this.canFly ? (x * currentSpeed + wind[0]) : (x * currentSpeed);        //в залежності від швидкості змінюється довжина вектора руху,
-            y = this.canFly ? (y * currentSpeed + wind[1]) : (y * currentSpeed);        //а якщо персонаж пересувається повітрям, то на його рух впливає вітер (поки, що просто сумою двох векторів)
-            this.currentLoc[0] += x;
-            this.currentLoc[1] += y;
+        this.moveTo = function(x,y) {
+            var myVek = Vekt.poinToVek(this.currentLoc,{x:x,y:y});
+            var coef = this.currentSpeed/Vekt.leng(myVek);
+            this.speedReserve = Vekt.leng(myVek)- this.currentSpeed;
+            var resVek = Vekt.multNom(myVek,(coef<1 ? coef : 1));
+            this.currentLoc = Vekt.summ(this.currentLoc,resVek);
+
+            console.log('x: ' + this.currentLoc.x + ' y: ' + this.currentLoc.y);
+            console.log('пройдено : '+Vekt.leng(resVek)+' з '+Vekt.leng(myVek)+' запас ходу : '+this.speedReserve);
+
+        }
+
+        this.move = function(){
+            var arr = this.route;
+            var vekArr= [];
+            if (arr.length>1){
+                for (var i=1; i<arr.length; i++){
+                    vekArr[i-1]=Vekt.poinToVek(arr[i-1],arr[i]);
+                }
+            }
+            console.dir(vekArr);
+
         }
 
         //метод, який описує удар по іншому персонажу (prey)
@@ -87,7 +104,7 @@ function Unit_2(uName) {
         this.name = uName;
         this.canFly = true;
         this.maxSpeed = 4;
-        this.currentSpeed = 2;
+        this.currentSpeed = 70;
         this.maxEnergy = 1000;                  //максимальна кількість енергії
         this.currentEnergy = 1000;              //поточна кількість енергії
         this.fireBallEnCost = 800;              //кількість енергії потрібна для певного скіла "fireBall"
@@ -112,8 +129,28 @@ function Unit_2(uName) {
         }
     }
 
+var Vekt = {
+    poinToVek : function(ob1,ob2){
+        return {x:(ob2.x-ob1.x),y:(ob2.y-ob1.y)};
+    },
+
+    leng : function (ob){
+        return Math.sqrt((ob.x*ob.x)+(ob.y*ob.y));
+    },
+
+    multNom : function (ob,n){
+        return {x: ob.x*n, y: ob.y*n};
+    },
+
+    summ : function (ob1,ob2){
+        return {x:(ob1.x+ob2.x),y:(ob1.y+ob2.y)};
+    }
+    }
+
     Unit_2.prototype = new Unit;
     Unit_2.prototype.constructor = Unit_2;
+
+
 
 
 module.exports.Unit = Unit;
