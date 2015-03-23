@@ -22,7 +22,7 @@ function Unit (uName) {
         this.speedReserve = 0;
         this.canFly = false;                    //можливість літати
         //this.route=[{x:50,y:20},{x:70,y:30},{x:80,y:20},{x:50,y:20}];
-        this.route=[{x:0,y:0},{x:0,y:100}];
+        this.route=[{x:0,y:0},{x:0,y:90},{x:0,y:200}];
         this.currentLoc = this.route[0];        //поточне розташування персонажа (координати в 2D)
         this.lvl = 1;                           //рівень персонажа
         this.currentEXP = 0;                    //
@@ -58,27 +58,29 @@ function Unit (uName) {
 
         //метод, який описує рух персонажа
         this.moveTo = function(x,y) {
+            console.log('x: ' + this.currentLoc.x + ' y: ' + this.currentLoc.y);
+
             var myVek = Vekt.poinToVek(this.currentLoc,{x:x,y:y});
-            var coef = this.currentSpeed/Vekt.leng(myVek);
+            var currentSpeed = arguments[2]<0 ? -arguments[2] : this.currentSpeed;
+            var coef = currentSpeed/Vekt.leng(myVek);
             this.speedReserve = Vekt.leng(myVek)- this.currentSpeed;
             var resVek = Vekt.multNom(myVek,(coef<1 ? coef : 1));
             this.currentLoc = Vekt.summ(this.currentLoc,resVek);
 
             console.log('x: ' + this.currentLoc.x + ' y: ' + this.currentLoc.y);
             console.log('пройдено : '+Vekt.leng(resVek)+' з '+Vekt.leng(myVek)+' запас ходу : '+this.speedReserve);
+            console.log('добавлено :'+arguments[2]);
 
         }
 
-        this.move = function(){
+        this.move = function() {
             var arr = this.route;
-            var vekArr= [];
-            if (arr.length>1){
-                for (var i=1; i<arr.length; i++){
-                    vekArr[i-1]=Vekt.poinToVek(arr[i-1],arr[i]);
-                }
-            }
-            console.dir(vekArr);
-
+            for (var i = 1; i < arr.length; i++) {
+            do {
+                this.moveTo(arr[i].x,arr[i].y,this.speedReserve);
+            } while (this.speedReserve > 0);
+        }
+            //console.dir(vekArr);
         }
 
         //метод, який описує удар по іншому персонажу (prey)
