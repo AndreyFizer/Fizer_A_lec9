@@ -17,7 +17,14 @@ app.get('/moveTo/:myX/:myY',function(req,res){
     res.status(200).send(loc);
 });
 
-unit_Vasya.moveTo(100,200);
+app.get('/move',function(req,res){
+    unit_Vasya.move();
+    loc += unit_Vasya.currentLoc.x+' --- '+unit_Vasya.currentLoc.y+'\n';
+    console.log(unit_Vasya.currentLoc);
+    res.status(200).send(loc);
+});
+
+//unit_Vasya.move();
 //unit_Vasya.moveTo(100,200);
 /*
 console.dir(unit_Vasya);
