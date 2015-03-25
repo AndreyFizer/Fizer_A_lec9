@@ -18,11 +18,11 @@ function Unit (uName) {
         this.maxHp = 1000;                      //максимальний запас здоров'я
         this.currentHp = 1000;                  //поточний запас здоров'я (0 - 1000)
         this.maxSpeed = 2;                      //максимальна швидкість персонажа
-        this.currentSpeed = 60 ;                // <змінено> поточна швидкість персонажа - кількість певних одиниць пройдених за один хід
+        this.currentSpeed = 300 ;                // <змінено> поточна швидкість персонажа - кількість певних одиниць пройдених за один хід
         this.speedReserve = 0;
         this.canFly = false;                    //можливість літати
         //this.route=[{x:50,y:20},{x:70,y:30},{x:80,y:20},{x:50,y:20}];
-        this.route=[{x:0,y:0},{x:0,y:90},{x:0,y:210}];
+        this.route=[ {x:0,y:0} , {x:0,y:100} , {x:100,y:100} , {x:100,y:200} ];
         this.currentLoc = this.route[0];        //поточне розташування персонажа (координати в 2D)
         this.lvl = 1;                           //рівень персонажа
         this.currentEXP = 0;                    //
@@ -58,42 +58,58 @@ function Unit (uName) {
 
         //метод, який описує рух персонажа
         this.moveTo = function(x,y) {
-            var myVek = Vekt.poinToVek(this.currentLoc,{x:x,y:y});
-            var currentSpeed = arguments[2]<0 ? -arguments[2] : this.currentSpeed;
-            var coef = currentSpeed/Vekt.leng(myVek);
-            this.speedReserve = Vekt.leng(myVek)- this.currentSpeed;
-            var resVek = Vekt.multNom(myVek,(coef<1 ? coef : 1));
-            this.currentLoc = Vekt.summ(this.currentLoc,resVek);
-
-            if (arguments[2]!== undefined){
-                this.route.shift();
-                if (this.speedReserve>0) {this.route.unshift(this.currentLoc)};
+            if (this.currentLoc.x == x && this.currentLoc.y == y) {
+                console.log('Ви вже тут !!!');
             } else {
-                this.route=[this.currentLoc,{x:x,y:y}];
-            }
+                var myVek = Vekt.poinToVek(this.currentLoc, {x: +x, y: +y});
+                console.log('=1 myVek ' + this.currentLoc.x + '    ' + this.currentLoc.y);
+                console.log('=1 myVek ' + x + '    ' + y);
+                var currentSpeed = (arguments[2]!==undefined && arguments[2]!==0) ? Math.abs(arguments[2]) : this.currentSpeed;
+                console.log('=2 currentSpeed ' + currentSpeed);
+                var coef = currentSpeed / Vekt.leng(myVek);
+                console.log('=3 coef ' + coef);
+                this.speedReserve = (Vekt.leng(myVek) - currentSpeed)<0 ? Math.abs(Vekt.leng(myVek) - currentSpeed) : 0 ;
+                console.log('=4 speedReserve ' + this.speedReserve);
+                var resVek = Vekt.multNom(myVek, (coef < 1 ? coef : 1));
+                this.currentLoc = Vekt.summ(this.currentLoc, resVek);
 
-            console.log('x: ' + this.currentLoc.x + ' y: ' + this.currentLoc.y);
-            console.log('пройдено : '+Vekt.leng(resVek)+' з '+Vekt.leng(myVek)+' запас ходу : '+this.speedReserve);
-            console.log('marshrut : '+this.route);
+                if (arguments[2] !== undefined) {
+                    this.route.shift();
+                    if (this.speedReserve == 0) {
+                        this.route.unshift(this.currentLoc)
+                    }
+                    ;
+                } else {
+                    this.route = [this.currentLoc, {x: +x, y: +y}];
+                };
 
-        }
+                console.log('пройдено : ' + Vekt.leng(resVek) + ' з ' + Vekt.leng(myVek) + ' запас ходу : ' + this.speedReserve);
+                console.log('=====');
+                console.log(this.route);
+                /*
+                for (var i = 1; i <= this.route.length; i++) {
+                    console.log(this.route[i - 1]);
+                };
+                */
+                console.log('=====');
+            };
+
+        };
 
         this.move = function() {
             var arr = this.route;
-            for (var i = 1; i < arr.length; i++) {
-            do {
-                if (this.speedReserve > 0){
-                    this.speedReserve=0;
-                    return};
-                this.moveTo(arr[i].x,arr[i].y,this.speedReserve);
-            } while (
-                this.speedReserve >= 0);
-
-            };
-
-
-            //console.dir(vekArr);
-        }
+            var speedReserve;
+            for (var i = 1; i <arr.length; i++) {
+                do {
+                    if (speedReserve === 0) {
+                        this.speedReserve=0;
+                        return
+                    };
+                    this.moveTo(arr[i].x, arr[i].y, this.speedReserve);
+                    speedReserve = this.speedReserve;
+                } while (speedReserve !== 0);
+            }
+        };
 
         //метод, який описує удар по іншому персонажу (prey)
         this.fight = function (prey) {
