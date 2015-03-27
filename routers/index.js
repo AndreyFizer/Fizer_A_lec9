@@ -28,6 +28,7 @@ function Unit (uName) {
         this.currentEXP = 0;                    //
         this.lvlUp_EXP = 400;                   //
         this.atBase = 50;                       //базова сила удару
+        this.atRange = 50;                      //дальність удару
         this.atCrtChns = 0.15;                  //шанс на нанести додатковий урон (0.0 - 1.0)
         this.atCrtPow = 1.2;                    //сила додаткового урона
         this.atAccur = 0.15;                    //точність нанесення ударів (0.0 - 0.95)
