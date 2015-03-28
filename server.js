@@ -4,10 +4,10 @@
 
 var express = require ('express');
 var app = express();
-var index = require('./routers/index.js');
+var uni = require('./other/units.js');
 
-var unit_Vasya = new index.Unit('Vasya na koni');
-var dracon_Vasya = new index.Unit_2('Vasya na drakoni');
+var unit_Vasya = new uni.Unit('Vasya na koni');
+var dracon_Vasya = new uni.Unit_2('Vasya na drakoni');
 var loc='';
 
 app.get('/moveTo/:myX/:myY',function(req,res){

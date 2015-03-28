@@ -8,9 +8,8 @@
 var wind = [20, -50];                          //вектор, що задає напрямок та силу вітру
 var MAX_LVL = 30;                              //максимальний рівень, якого можуть досягти персонажі
 
-var marshUnit = [{x:50,y:20},{x:70,y:30},{x:80,y:20},{x:50,y:20}];
-var marshUnit_2 = [{},{}];
-//console.log("Пов'язало");
+var Vekt = require('./../other/vektor.js');
+var Const = require('./../other/constants.js');
 
 //ф-ція, що описує 1-ий клас - Персонаж №1
 function Unit (uName) {
@@ -87,11 +86,6 @@ function Unit (uName) {
                 console.log('пройдено : ' + Vekt.leng(resVek) + ' з ' + Vekt.leng(myVek) + ' запас ходу : ' + this.speedReserve);
                 console.log('=====');
                 console.log(this.route);
-                /*
-                for (var i = 1; i <= this.route.length; i++) {
-                    console.log(this.route[i - 1]);
-                };
-                */
                 console.log('=====');
             };
 
@@ -114,20 +108,27 @@ function Unit (uName) {
 
         //метод, який описує удар по іншому персонажу (prey)
         this.fight = function (prey) {
-            var atBase = this.atBase;
-            var atCrtChns = this.atCrtChns;
-            var atCrtPow = this.atCrtPow;
-            var atAccur = this.atAccur;
-            var atEvas = prey.atEvas;
-            var atArmor = prey.atArmor;
-            var pow = (Math.random() <= atCrtChns ? atBase + atBase * atCrtPow : atBase);   //з заданою імовірністю наносить додатковий урон,
-            pow = (pow - pow * (atArmor/100)) * (Math.random() <= atEvas ? 0 : 1);          //який змінюється в залежності від захисту об'єкта та його можливості ухилитися
-            prey.currentHp = prey.currentHp - pow;
-            console.log('>>> ' + this.name + ' <'+pow+' dmg>  --> ' + prey.name + ' [ ' + prey.maxHp + '/' + prey.currentHp+' ]');
-            this.currentEXP += pow;                                                         //нехай опит набутий персонажем залежить від урона, який він наніс
-            if (this.currentEXP >= this.lvlUp_EXP && this.lvl < MAX_LVL) { this.lvl_UP() };
-        }
+            if (Vekt.leng(Vekt.poinToVek(this.currentLoc, prey.currentLoc)) <= this.atRange) {
 
+                var atBase = this.atBase;
+                var atCrtChns = this.atCrtChns;
+                var atCrtPow = this.atCrtPow;
+                var atAccur = this.atAccur;
+                var atEvas = prey.atEvas;
+                var atArmor = prey.atArmor;
+                var pow = (Math.random() <= atCrtChns ? atBase + atBase * atCrtPow : atBase);   //з заданою імовірністю наносить додатковий урон,
+                pow = (pow - pow * (atArmor / 100)) * (Math.random() <= atEvas ? 0 : 1);          //який змінюється в залежності від захисту об'єкта та його можливості ухилитися
+                prey.currentHp = prey.currentHp - pow;
+                //console.log('>>> ' + this.name + ' <' + pow + ' dmg>  --> ' + prey.name + ' [ ' + prey.maxHp + '/' + prey.currentHp + ' ]');
+                this.currentEXP += pow;                                                         //нехай опит набутий персонажем залежить від урона, який він наніс
+                if (this.currentEXP >= this.lvlUp_EXP && this.lvl < Const.MAX_LVL) {
+                    this.lvl_UP()
+                };
+                return '>>> ' + this.name + ' <' + pow + ' dmg>  --> ' + prey.name + ' [ ' + prey.maxHp + '/' + prey.currentHp + ' ]';
+            } else {
+                return 'Ви занадто далеко від цілі щоб нанести удар !!!';
+            }
+        }
     }
 
 //ф-ція, що описує 2-ий клас - Персонаж №2
@@ -152,7 +153,7 @@ function Unit_2(uName) {
                 prey.currentHp = prey.currentHp - pow;
                 console.log('>>> ' + this.name + ' FIREball <'+pow+' dmg>  --> ' + prey.name + ' [ ' + prey.maxHp + '/' + prey.currentHp+' ]');
                 this.currentEXP += pow;
-                if (this.currentEXP >= this.lvlUp_EXP && this.lvl < MAX_LVL) { this.lvl_UP() };
+                if (this.currentEXP >= this.lvlUp_EXP && this.lvl < Const.MAX_LVL) { this.lvl_UP() };
             } else {
                 console.log('Не достатньо енергії');
             }
@@ -160,23 +161,6 @@ function Unit_2(uName) {
         }
     }
 
-var Vekt = {
-    poinToVek : function(ob1,ob2){
-        return {x:(ob2.x-ob1.x),y:(ob2.y-ob1.y)};
-    },
-
-    leng : function (ob){
-        return Math.sqrt((ob.x*ob.x)+(ob.y*ob.y));
-    },
-
-    multNom : function (ob,n){
-        return {x: ob.x*n, y: ob.y*n};
-    },
-
-    summ : function (ob1,ob2){
-        return {x:(ob1.x+ob2.x),y:(ob1.y+ob2.y)};
-    }
-    }
 
     Unit_2.prototype = new Unit;
     Unit_2.prototype.constructor = Unit_2;
