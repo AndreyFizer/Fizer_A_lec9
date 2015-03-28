@@ -5,10 +5,11 @@
 "use strict"
 
 var wind = [20, -50];                          //вектор, що задає напрямок та силу вітру
-var MAX_LVL = 30;                              //максимальний рівень, якого можуть досягти персонажі
 
 var Vekt = require('./../other/vektor.js');
 var Const = require('./../other/constants.js');
+var Marsh = require('./../other/marshrut.js');
+
 
 //ф-ція, що описує 1-ий клас - Персонаж №1
 function Unit (uName) {
@@ -16,17 +17,16 @@ function Unit (uName) {
     this.maxHp = 1000;                      //максимальний запас здоров'я
     this.currentHp = 1000;                  //поточний запас здоров'я (0 - 1000)
     this.maxSpeed = 2;                      //максимальна швидкість персонажа
-    this.currentSpeed = 300 ;                // <змінено> поточна швидкість персонажа - кількість певних одиниць пройдених за один хід
+    this.currentSpeed = 75 ;                // <змінено> поточна швидкість персонажа - кількість певних одиниць пройдених за один хід
     this.speedReserve = 0;
     this.canFly = false;                    //можливість літати
-    //this.route=[{x:50,y:20},{x:70,y:30},{x:80,y:20},{x:50,y:20}];
-    this.route=[ {x:0,y:0} , {x:0,y:100} , {x:100,y:100} , {x:100,y:200} ];
+    this.route=Marsh.route_1;
     this.currentLoc = this.route[0];        //поточне розташування персонажа (координати в 2D)
     this.lvl = 1;                           //рівень персонажа
     this.currentEXP = 0;                    //
     this.lvlUp_EXP = 400;                   //
     this.atBase = 50;                       //базова сила удару
-    this.atRange = 50;                      //дальність удару
+    this.atRange = 40;                      //дальність удару
     this.atCrtChns = 0.15;                  //шанс на нанести додатковий урон (0.0 - 1.0)
     this.atCrtPow = 1.2;                    //сила додаткового урона
     this.atAccur = 0.15;                    //точність нанесення ударів (0.0 - 0.95)
@@ -57,8 +57,9 @@ function Unit (uName) {
 
     //метод, який описує рух персонажа
     this.moveTo = function(x,y) {
+        var forLog='('+this.currentLoc.x.toFixed(1)+' ; '+this.currentLoc.y.toFixed(1)+')';
         if (this.currentLoc.x == x && this.currentLoc.y == y) {
-            console.log('Ви вже тут !!!');
+            return 'Ви вже тут !!!';
         } else {
             var myVek = Vekt.poinToVek(this.currentLoc, {x: +x, y: +y});
             console.log('=1 myVek ' + this.currentLoc.x + '    ' + this.currentLoc.y);
@@ -76,8 +77,7 @@ function Unit (uName) {
                 this.route.shift();
                 if (this.speedReserve == 0) {
                     this.route.unshift(this.currentLoc)
-                }
-                ;
+                };
             } else {
                 this.route = [this.currentLoc, {x: +x, y: +y}];
             };
@@ -86,23 +86,36 @@ function Unit (uName) {
             console.log('=====');
             console.log(this.route);
             console.log('=====');
+            return this.name+' moved from point  '+forLog+' ===> to point  ('+
+                this.currentLoc.x.toFixed(1)+' ; '+this.currentLoc.y.toFixed(1)+')';
         };
 
     };
 
     this.move = function() {
         var arr = this.route;
+        var log=this.name+' moved from point  ('+this.currentLoc.x.toFixed(1)+
+            ' ; '+this.currentLoc.y.toFixed(1)+')';
+        var forLog='';
         var speedReserve;
-        for (var i = 1; i <arr.length; i++) {
-            do {
-                if (speedReserve === 0) {
-                    this.speedReserve=0;
-                    return
-                };
-                this.moveTo(arr[i].x, arr[i].y, this.speedReserve);
-                speedReserve = this.speedReserve;
-            } while (speedReserve !== 0);
+        if (arr.length>1) {
+            for (var i = 1; i < arr.length; i++) {
+                do {
+                    if (speedReserve === 0) {
+                        this.speedReserve = 0;
+                        return log += ' ===> to point  ('+
+                            this.currentLoc.x.toFixed(1)+' ; '+this.currentLoc.y.toFixed(1)+')';
+                    };
+                    log += forLog;
+                    this.moveTo(arr[i].x, arr[i].y, this.speedReserve);
+                    speedReserve = this.speedReserve;
+                    forLog = ' ===> through the point ('+this.currentLoc.x.toFixed(1)+
+                        ' ; '+this.currentLoc.y.toFixed(1)+')';
+                } while (speedReserve !== 0);
+            }
         }
+        return log += ' ===> to point  ('+
+            this.currentLoc.x.toFixed(1)+' ; '+this.currentLoc.y.toFixed(1)+')';
     };
 
     //метод, який описує удар по іншому персонажу (prey)
@@ -123,9 +136,9 @@ function Unit (uName) {
             if (this.currentEXP >= this.lvlUp_EXP && this.lvl < Const.MAX_LVL) {
                 this.lvl_UP()
             };
-            return '>>> ' + this.name + ' <' + pow + ' dmg>  --> ' + prey.name + ' [ ' + prey.maxHp + '/' + prey.currentHp + ' ]';
+            return '>>> ' + this.name + ' <' + pow.toFixed(2) + ' dmg>  --> ' + prey.name + ' [ ' + prey.maxHp.toFixed(2) + '/' + prey.currentHp.toFixed(2) + ' ]';
         } else {
-            return 'Ви занадто далеко від цілі щоб нанести удар !!!';
+            return 'You are too far from the target to strike !!!';
         }
     }
 }
@@ -139,6 +152,9 @@ function Unit_2(uName) {
     this.maxEnergy = 1000;                  //максимальна кількість енергії
     this.currentEnergy = 1000;              //поточна кількість енергії
     this.fireBallEnCost = 800;              //кількість енергії потрібна для певного скіла "fireBall"
+    this.route=Marsh.route_2;
+    this.currentLoc = this.route[0];
+    this.atRange = 60;
 
     //метод, який описує скіл використаний на об'єкт (prey)
     this.fireBall = function (prey) {
@@ -154,7 +170,7 @@ function Unit_2(uName) {
             this.currentEXP += pow;
             if (this.currentEXP >= this.lvlUp_EXP && this.lvl < Const.MAX_LVL) { this.lvl_UP() };
         } else {
-            console.log('Не достатньо енергії');
+            console.log('Not enough energy !!!');
         }
 
     }
