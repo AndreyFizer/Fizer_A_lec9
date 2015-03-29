@@ -3,7 +3,7 @@
  */
 module.exports = {
     MAX_LVL : 30,
-    MAX_X : 600,
-    MAX_Y : 800
+    MAX_X : 800,
+    MAX_Y : 600
 }
 
