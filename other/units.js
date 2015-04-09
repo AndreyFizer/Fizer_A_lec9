@@ -14,18 +14,20 @@ var Marsh = require('./../other/marshrut.js');
 //ф-ц≥€, що описуЇ 1-ий клас - ѕерсонаж є1
 function Unit (uName) {
     this.name = uName;                      //≥м'€ персонажа
-    this.maxHp = 1000;                      //максимальний запас здоров'€
-    this.currentHp = 1000;                  //поточний запас здоров'€ (0 - 1000)
-    this.maxSpeed = 2;                      //максимальна швидк≥сть персонажа
-    this.currentSpeed = Marsh.speed_1 ;     // <зм≥нено> поточна швидк≥сть персонажа - к≥льк≥сть певних одиниць пройдених за один х≥д
+    //this.maxHp = 1000;                    //максимальний запас здоров'€
+    //this.currentHp = 1000;                //поточний запас здоров'€ (0 - 1000)
+    this.health=100;
+    //this.maxSpeed = 2;                    //максимальна швидк≥сть персонажа
+    this.distance = 50;                     //this.currentSpeed = Marsh.speed_1 ;     // <зм≥нено> поточна швидк≥сть персонажа - к≥льк≥сть певних одиниць пройдених за один х≥д
     this.speedReserve = 0;                  //при рус≥ по маршруту - вказуЇ запас ходу
     this.canFly = false;                    //можлив≥сть л≥тати
     this.route=Marsh.route_1;               //маршрут персонажа
-    this.currentLoc = this.route[0];        //поточне розташуванн€ персонажа (координати в 2D)
+    this.x=0;
+    this.y=0;                               //поточне розташуванн€ персонажа (координати в 2D)
     this.lvl = 1;                           //р≥вень персонажа
     this.currentEXP = 0;                    //
     this.lvlUp_EXP = 300;                   //
-    this.atBase = 50;                       //базова сила удару
+    this.power = 20;//this.atBase = 50;                       //базова сила удару
     this.atRange = 40;                      //дальн≥сть удару
     this.atCrtChns = 0.15;                  //шанс на нанести додатковий урон (0.0 - 1.0)
     this.atCrtPow = 1.2;                    //сила додаткового урона
@@ -35,26 +37,28 @@ function Unit (uName) {
 
 
     //метод, €кий зм≥нюЇ характеристики персонажа при зб≥льшенн≥ його р≥вн€
-    this.lvl_UP = function () {
-        this.maxHp *= 1.1;
-        this.currentHp = this.maxHp;
-        if (this.maxEnergy){
-            this.maxEnergy *= 1.1;
-            this.currentEnergy = this.maxEnergy;
-        }
-        this.currentSpeed += 2;
-        this.lvl += 1;
-        console.log('>>> '+this.name + ' LVL UP --> ' + this.lvl + ' !!!');
-        this.currentEXP -= this.lvlUp_EXP;
-        this.lvlUp_EXP *= 1.2;
-        this.atBase *= 1.2;
-        this.atCrtChns += 0.05;
-        this.atCrtPow += 0.1;
-        this.atAccur += 0.05;
-        this.atEvas += 0.015;
-        this.atArmor += 2;
-        return '>>> '+this.name + ' LVL UP --> ' + this.lvl + ' !!!';
-    }
+    //this.lvl_UP = function () {
+    //    this.maxHp *= 1.1;
+    //    this.currentHp = this.maxHp;
+    //    if (this.maxEnergy){
+    //        this.maxEnergy *= 1.1;
+    //        this.currentEnergy = this.maxEnergy;
+    //    }
+    //    this.currentSpeed += 2;
+    //    this.lvl += 1;
+    //    console.log('>>> '+this.name + ' LVL UP --> ' + this.lvl + ' !!!');
+    //    this.currentEXP -= this.lvlUp_EXP;
+    //    this.lvlUp_EXP *= 1.2;
+    //    this.atBase *= 1.2;
+    //    this.atCrtChns += 0.05;
+    //    this.atCrtPow += 0.1;
+    //    this.atAccur += 0.05;
+    //    this.atEvas += 0.015;
+    //    this.atArmor += 2;
+    //    return '>>> '+this.name + ' LVL UP --> ' + this.lvl + ' !!!';
+    //}
+
+    this.
 
     //метод, €кий описуЇ рух персонажа в точку (x,y)
     this.moveTo = function(x,y) {
@@ -128,7 +132,7 @@ function Unit (uName) {
     };
 
     //метод, €кий описуЇ удар по ≥ншому персонажу (prey)
-    this.fight = function (prey) {
+    this.fight_1 = function (prey) {
         if (Vekt.leng(Vekt.poinToVek(this.currentLoc, prey.currentLoc)) <= this.atRange) {    //пров≥р€эмо чи противник в зоны удару
             if (prey.currentHp>0){
             var atBase = this.atBase;
