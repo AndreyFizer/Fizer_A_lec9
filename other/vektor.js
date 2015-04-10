@@ -24,5 +24,12 @@ module.exports = {
     // сума векторів
     summ : function (ob1,ob2){
         return {x:(ob1.x+ob2.x),y:(ob1.y+ob2.y)};
+    },
+
+    unitDistance : function (ob){
+        var newX = ob.x - this.x;
+        var newY = ob.y - this.y;
+        return Math.sqrt((newX*newX)+(newY*newY));
     }
+
 }

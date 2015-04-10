@@ -53,18 +53,18 @@ module.exports = function(app) {
     });
 
     //рухаємося по заданому маршруту
-    app.get('/move', function (req, res) {
+    /*app.get('/move', function (req, res) {
         if (whatUnit.currentUnit().currentHp>0) {
             logg += whatUnit.currentUnit().move() +'\n';
         }else{
             logg += "Sorry, but you're dead \n";
         }
         res.status(200).send(logg);
-    });
+    });*/
 
     //наносимо удар противнику
     app.get('/fight', function (req, res) {
-        if (whatUnit.currentUnit().currentHp>0) {
+        if (whatUnit.currentUnit().health>0) {
             logg += whatUnit.currentUnit().fight(whatUnit.enemyUnit())+ '\n';
         }else{
             logg += "Sorry, but you're dead \n";

@@ -14,6 +14,7 @@ var Marsh = require('./../other/marshrut.js');
 //ф-ція, що описує 1-ий клас - Персонаж №1
 function Unit (uName) {
     this.name = uName;                      //ім'я персонажа
+    this.isEnemy = "af";
     //this.maxHp = 1000;                    //максимальний запас здоров'я
     //this.currentHp = 1000;                //поточний запас здоров'я (0 - 1000)
     this.health=100;
@@ -28,9 +29,9 @@ function Unit (uName) {
     this.currentEXP = 0;                    //
     this.lvlUp_EXP = 300;                   //
     this.power = 20;//this.atBase = 50;                       //базова сила удару
-    this.atRange = 40;                      //дальність удару
+    this.range = 10  ;                      //дальність удару
     this.atCrtChns = 0.15;                  //шанс на нанести додатковий урон (0.0 - 1.0)
-    this.atCrtPow = 1.2;                    //сила додаткового урона
+    this.atCrtPow = 0.8;                    //сила додаткового урона
     this.atAccur = 0.15;                    //точність нанесення ударів (0.0 - 0.95)
     this.atEvas = 0.1;                      //шанс ухилитись від удару противника (0.0 - 1.0)
     this.atArmor = 20;                      //
@@ -58,11 +59,50 @@ function Unit (uName) {
     //    return '>>> '+this.name + ' LVL UP --> ' + this.lvl + ' !!!';
     //}
 
-    this.
+    this.fight = function (target) {
+        if (this.health === 0) {return  "Sorry, but you're dead"}
+        if (target.health === 0) {return  'You can`t strike your enemy, because he is already dead'}
+        if (this.isEnemy === target.isEnemy) {return  'Not enemy'}
+
+        var range = this.range;
+        var howFar = Vekt.unitDistance.call(this,target);  //відстань до противника
+        var HP = target.health;
+        var atEvas = target.atEvas ? target.atEvas : 0.1;  //шанс ухилитися
+        var damage = this.power;
+        var atCrtChns = this.atCrtChns ? this.atCrtChns : 0.2;  //шанс кріта
+        var atCrtPow = this.atCrtPow ? this.atCrtPow : 0.8;  //сила кріта
+
+        if (howFar <= range){
+            damage = (Math.random() <= atCrtChns ? damage + damage * atCrtPow : damage);  //розраховується кріт
+            damage = damage * (Math.random() <= atEvas ? 0 : 1);  //розраховується промах
+            HP = (HP - damage) > 0 ? (HP - damage).toFixed(2) : 0;
+            target.health = HP;
+            return this.name+' baxnyv '+damage+' to '+target.name+', his HP= '+ HP;
+        }else{
+            this.moveTo(target.x,target.y);
+            var distin = howFar - Vekt.unitDistance.call(this,target);  //пройдена відстань
+            howFar = howFar - distin;
+
+            if (howFar <= range) {                                      //шось типу удару з розбіга
+                atEvas = (howFar < 0.1) ? atEvas*0.6 : atEvas*1.6;
+                damage = (howFar < 0.1) ? damage*1.1 : damage*0.8;
+                damage = (Math.random() <= atCrtChns ? damage + damage * atCrtPow : damage);
+                damage = damage * (Math.random() <= atEvas ? 0 : 1);
+                HP = (HP - damage) > 0 ? (HP - damage).toFixed(2) : 0;
+                target.health = HP;
+                return this.name+' baxnyv z rozbega '+damage+' to '+target.name+', his HP= '+ HP;
+            }else{
+                return 'You are too far from the target to strike';
+            }
+        }
+    }
 
     //метод, який описує рух персонажа в точку (x,y)
     this.moveTo = function(x,y) {
-        var forLog='('+this.currentLoc.x.toFixed(1)+' ; '+this.currentLoc.y.toFixed(1)+')';
+        this.x=x;
+        this.y=y;
+
+        /*var forLog='('+this.currentLoc.x.toFixed(1)+' ; '+this.currentLoc.y.toFixed(1)+')';
         if ((this.currentLoc.x == x && this.currentLoc.y == y) || ((this.route.length<2) && (arguments[2] !== undefined))) {
             return 'Your current location : ('+this.currentLoc.x.toFixed(1)+' ; '+this.currentLoc.y.toFixed(1)+'). You have arrived to your destination';
         } else {
@@ -98,12 +138,12 @@ function Unit (uName) {
                     this.currentLoc.x.toFixed(1) + ' ; ' + this.currentLoc.y.toFixed(1) + ')';
             }
         };
-
+*/
     };
 
     //метод, який описує рух персонажа по заданому маршруту
     /* по суті застосовує метод moveTo(х,у) до кожного відрізка маршруту */
-    this.move = function() {
+    /*this.move = function() {
         var arr = this.route;
         var log=this.name+' moved from point  ('+this.currentLoc.x.toFixed(1)+
             ' ; '+this.currentLoc.y.toFixed(1)+')';
@@ -129,10 +169,10 @@ function Unit (uName) {
         };
         return log += ' ===> to point  ('+
             this.currentLoc.x.toFixed(1)+' ; '+this.currentLoc.y.toFixed(1)+')';
-    };
+    };*/
 
     //метод, який описує удар по іншому персонажу (prey)
-    this.fight_1 = function (prey) {
+    /*this.fight_1 = function (prey) {
         if (Vekt.leng(Vekt.poinToVek(this.currentLoc, prey.currentLoc)) <= this.atRange) {    //провіряэмо чи противник в зоны удару
             if (prey.currentHp>0){
             var atBase = this.atBase;
@@ -158,21 +198,25 @@ function Unit (uName) {
         } else {
             return 'You are too far from the target to strike !!!';
         }
-    }
+    }*/
 }
 
 //ф-ція, що описує 2-ий клас - Персонаж №2
 function Unit_2(uName) {
     this.name = uName;
+    this.health = 120;
+    this.isEnemy = "ff";
+    this.x= 0;
+    this.y= 40;
     this.canFly = true;
-    this.maxSpeed = 4;
-    this.currentSpeed = Marsh.speed_2;
+    //this.maxSpeed = 4;
+    //this.currentSpeed = Marsh.speed_2;
     this.maxEnergy = 1000;                  //максимальна кількість енергії
     this.currentEnergy = 1000;              //поточна кількість енергії
     this.fireBallEnCost = 800;              //кількість енергії потрібна для певного скіла "fireBall"
-    this.route=Marsh.route_2;
-    this.currentLoc = this.route[0];
-    this.atRange = 60;
+    //this.route=Marsh.route_2;
+    //this.currentLoc = this.route[0];
+    this.range = 20;
 
     //метод, який описує скіл використаний на об'єкт (prey)
     this.fireBall = function (prey) {
